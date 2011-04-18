@@ -1,0 +1,9 @@
+<h1>Search</h1>
+
+<%= form_tag '/search', :id => "search", :method => :get do %>
+<%= text_field_tag "query", params[:query],
+    :autocomplete => "off",
+    :placeholder => "Cafe / Auto / Computers" %>
+<%= text_field_tag "near", params[:near], :autocomplete => "off",
+    :placeholder => "Near #{@default_loc}" %>
+<% end %>

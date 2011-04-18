@@ -1,0 +1,150 @@
+<h1>About this app</h1>
+<style>
+body { width: 500px; text-align: justify; }
+</style>
+
+<p>Hi, I am Vimal and this is my submission to the IndexTank+Factual
+competition titled <%= link_to "Srch!", "/maps" %>.  The idea is very
+simple: enable local search and make it user friendly by creating a
+maps based UI that lets the user quickly locate information about
+businesses.</p>
+
+<p>This is the first time I am developing with Rails, and it was fun
+using the various libraries that are available.  I used the following
+technologies:</p>
+
+<ul>
+  <li>
+    <div>
+      <b><%= link_to "IndexTank gem", "http://indextank.com/documentation/ruby-client" %></b>
+      <div>
+        The main indexing service that proved to be useful.  The main
+        feature that was helpful was the Geospatial index, which took
+        a while to figure out how to use.
+      </div>
+    </div>
+  </li>
+
+  <li>
+    <div>
+      <b><%= link_to "Factual gem", "https://github.com/Factual/ruby-factual" %></b>
+      <div>
+        I created a table under my user account (jvimal) to curate
+        data entered by the user.  This would help improve Factual's
+        dataset.
+      </div>
+    </div>
+  </li>
+
+  <li>
+    <div>
+      <b><%= link_to "Geocoder gem", "https://github.com/alexreisner/geocoder" %></b>
+      <div>
+        This is a real <em>gem</em> of a gem!  I used this to get the
+        user's location based on their IP address.  Also, this gem
+        uses Google geocoding service to give lat/long coordinates for
+        strings like: <em>market and vanness</em>, <em>elcamino and
+        galvez</em>, etc.  This helped bootstrap the local search very
+        easily.
+      </div>
+    </div>
+  </li>
+
+
+  <li>
+    <div>
+      <b><%= link_to "Ruby on Rails 3", "http://rubyonrails.org" %></b>
+      <div>
+        I always wanted to learn RoR and this was a perfect
+        opportunity to hack apps using it.  There was a learning curve
+        to get used to, but it surely makes app development a breeze!
+      </div>
+    </div>
+  </li>
+
+  <li>
+    <div>
+      <b><%= link_to "Heroku", "http://heroku.com" %></b>
+      <div>
+        For a long time I was wondering how I would host this, when I
+        recalled that submissions in the previous competition used
+        Heroku.  I had this app deployed and running in no time!
+      </div>
+    </div>
+  </li>
+
+  <li>
+    <div>
+      <b><%= link_to "Pow!!", "http://pow.cx" %></b> and
+      <b><%= link_to "nodejs", "http://nodejs.org" %></b>
+      <div>
+        The "zero configuration" Rack server helped me test the Rails
+        application on my machines very very easily.  It uses a DNS
+        server and HTTP server written in node.js.
+      </div>
+    </div>
+  </li>
+
+  <li>
+    <div>
+      <b>JS libraries/CSS</b>
+      <ul>
+        <li><%= link_to "jQuery", "http://jquery.com" %></li>
+        <li><%= link_to "Google Maps v3", "http://code.google.com/apis/maps/documentation/javascript/" %></li>
+        <li><%= link_to "qTip 2", "http://craigsworks.com/projects/qtip2/" %></li>
+        <li><%= link_to "Drop shadows", "http://nicolasgallagher.com/css-drop-shadows-without-images/demo/" %></li>
+        <li><%= link_to "jQuery in place editor", "http://code.google.com/p/jquery-in-place-editor/" %></li>
+        <li><%= link_to "CSS buttons", "http://ubuwaits.github.com/css3-buttons/" %></li>
+        <li><%= link_to "Web 2.0 logo Creatr!", "http://creatr.cc/creatr/" %></li>
+      </ul>
+    </div>
+  </li>
+
+  <li>
+    <div>
+      <b><font color="red">Abandoned</font>: <%= link_to "Flickraw",
+      "http://hanklords.github.com/flickraw/" %></b>
+      <div>
+        I wanted to mashup a few pictures from flickr as well, but
+        abandoned the idea so as to not confuse users.  Flickr also
+        had geotagging that can be used to pull pics taken from a
+        given location.
+      </div>
+    </div>
+  </li>
+
+  <li>
+    <div>
+      <b><%= link_to "Vim", "http://vim.org" %></b> and
+      <b><%= link_to "Emacs", "http://www.gnu.org/software/emacs/" %></b>
+	  <b><%= link_to "TextMate", "http://www.macromates.org" %></b>
+      <div>
+        I used to take pride in being a user of <em>Editor</em>.  Each
+        of the above editors have their own strengths and weaknesses,
+        so I use both depending on what I am doing. :-) I listed "Vim"
+        first as it is a prefix of my firstname.
+      </div>
+    </div>
+  </li>
+
+</ul>
+
+<h2>Feedback</h2>
+<p>I liked the IndexTank service, but I felt at least one extra
+feature would have been really good: Distance limits on Geospatial
+Index.  That is, I wanted to be able to specify a scoring function as
+follows:</p>
+
+<code>
+function:  miles(d[0], d[1], q[0], q[1]) < 10km
+</code>
+
+<p>It would have enabled me to restrict search results to within 10km
+of the place searched, rather than the actual number of search
+results.  It would help narrow search results much more effectively!
+Maybe it is possible to use the <em>if</em> statement to
+achieve the same, but I am not sure.</p>
+
+<h3>About me</h3> I am a <%= link_to "graduate student",
+"http://www.stanford.edu/~jvimal" %> and my research interests are
+Networks and Security, and in general: Systems.

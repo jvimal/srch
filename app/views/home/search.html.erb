@@ -1,0 +1,69 @@
+<div>
+<%= form_tag '/search', :id => "search", :method => :get do %>
+<a href="/search"><img src="/images/Srch.png" style="float: left;padding-top: 5px;"/></a>
+
+<%= text_field_tag "query", params[:query],
+    :autocomplete => "off",
+    :placeholder => "Cafe / Auto / Computers", :size => 30 %>
+
+<%= text_field_tag "near", params[:near], :autocomplete => "off",
+    :placeholder => "Near #{@default_loc}", :size => 30 %>
+
+<%= submit_tag "Srch!", :class => "clean-gray" %>
+<% end %>
+</div>
+
+<p>Searching about 360K businesses <b>only</b> from San Francisco, Los
+Angeles, San Diego, Seattle, New York and Chicago.</p>
+
+<% if @results['matches'] == 0 then %>
+<p>We couldn't find any businesses that match <%= params[:query] %>
+near <%= @default_loc %>.
+
+<% if @pics.size != 0 then %> But, here are some pictures for the
+search from that region!</p>  <% end %>
+
+<% else %>
+<% if @results['matches'] != -1 %>
+<p>Found <%= @results['matches'] %> results.
+
+<%= link_to "See results on an interactive map.", "/maps?" + params[:query].to_query('query') + "&" + params[:near].to_query('near') %></p>
+<% end %>
+<% end %>
+
+<% @results['results'].each do |category, items| %>
+<div style="clear: both; padding-top: 1em;">
+<div class="pheading"><%= category %></div>
+<ul id="presults">
+<% items.each do |r| %>
+<li class="presult">
+  <div class="drop-shadow curved pitem">
+    <div class="pname"><%= r['name'] %></div>
+
+    <div class="plinks">
+      <span class="pmaps"><%= link_to "Maps", "/maps?" + r['name'].to_query('query')   %></span>
+      <% if r['website'].strip.length then %>
+      <span class="pwebsite"><%= link_to "Website", r['website'] %></span>
+      <% end %>
+    </div>
+
+    <div class="paddress"><%= r['address'] %></div>
+    <div class="paddress2"><%= r['city'] %>, <%= r['state'] %></div>
+<% if r['telephone'].strip.length > 0 %>
+    <span class="label">Tel:</span><span class="pphone"><%= r['telephone'] %></span><br/>
+<% end %>
+
+<% if r['fax'].strip.length > 0 %>
+    <span class="label">Fax:</span><span class="pfax"><%= r['fax'] %></span><br/>
+<% end %>
+  </div>
+</li>
+<% end %>
+</ul>
+</div>
+
+<% end %>
+
+<div style="clear: both; padding-top: 50px; text-align: center;">
+  For IndexTank+Factual competition submission.
+</div>

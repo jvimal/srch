@@ -1,0 +1,277 @@
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+<%= javascript_include_tag "/javascripts/jquery.editinplace.js" %>
+<%= javascript_include_tag "/javascripts/jquery.qtip.min.js" %>
+
+<style>
+html, body {
+  margin: 0 0 0 0;
+  height: 100%;
+}
+
+div#map {
+  height: 100%;
+  width: 100%;
+}
+
+#search {
+  height: 35px;
+  position: absolute;
+  left: 120px;
+  right: 120px;
+  background-color: black;
+  z-index: 100;
+  clear: both;
+}
+
+#pics {
+  height: 75px;
+  padding: 0; margin: 0;
+  position: absolute;
+  bottom: 0px;
+  left: 0; right: 0;
+  background-color: black;
+  z-index: 100;
+  clear: both;
+}
+
+#_pics {
+  height: 75px;
+  padding: 0; margin: 0;
+  position: absolute;
+  bottom: 0;
+  z-index: 101;
+  clear: both;
+}
+
+#_pics img {
+  padding-left: 30px;
+}
+
+.translucent {
+	opacity:0.7;
+	filter:alpha(opacity=70);
+	-moz-opacity:0.7;
+}
+
+#controls {
+  position: absolute;
+  top: 0px;
+  left: 120px;
+  right: 120px;
+  background-color: none;
+  z-index: 101;
+  text-align: center;
+}
+
+#controls form { background: none; top: 5px; }
+#controls form input[type="text"] { min-width: 100px; width: 30%; }
+#controls form span.tot {
+  color: white;
+  text-shadow: 0px 2px 2px #111;
+  font-size: 0.8em;
+}
+
+.i-wrapper * input[type="text"] {
+  font-size: 1em;
+  height: 1em;
+}
+
+span.small {
+  font-size: 0.9em;
+  padding-right: 10px;
+  width: 60px;
+  text-align: right;
+  display: inline-block;
+}
+
+#controls a.text {
+  color: white;
+}
+
+#controls a.text:hover {
+  text-decoration: none;
+}
+
+.i-web { font-size: 0.8em; }
+
+</style>
+
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<script type="text/javascript">
+var markers, results, infowindows, openwindow;
+
+function edit_in_place(i) {
+
+$(".i-wrapper").qtip({
+  content: "<p style='width: 200px;'><b>Contribute!</b><br/>Click to edit the data in place."
+          + "The values are curated and will be used to improve "
+          + "<em>Factual's</em> database.</p><p style='width:200px;'>Please note that your suggestions will not be reflected immediately.</p>",
+  position: { my: 'right center', at: 'left center' }
+});
+
+$(".i-cat").editInPlace({
+  url: "/edit",
+  params: "key=category&docid=" + results[i].info.docid,
+  default_text: "Unknown 'Category' (e.g.: Entertainment); Click here to add!",
+  bg_over: "#ff6"
+});
+
+$(".i-address").editInPlace({
+  url: "/edit",
+  params: "key=address&docid=" + results[i].info.docid,
+  bg_over: "#ff6",
+  field_type: "textarea",
+  textarea_rows: 2,
+});
+
+klasses = ["i-tel", "i-fax", "i-web"];
+keys = ["telephone", "fax", "website"];
+
+for(var i = 0; i < klasses.length; i++) {
+$("." + klasses[i]).editInPlace({
+  url: "/edit",
+  params: "key=" + keys[i] + "&docid=" + results[i].info.docid,
+  bg_over: "#ff6"
+});
+}
+}
+
+
+function get_content(i) {
+  var r = results[i];
+  var info = r.info;
+  ret = "<div class='i-wrapper'><div class='i-title'>" + r.title + "</div>";
+  ret += "<div class='i-cat'>" + info.category + "</div>";
+  ret += "<div class='i-address'>" + info.address + "<br/>\n";
+  ret += "" + info.city + ", " + info.state + "</div>";
+
+    ret += "<span class='small'>Phone:</span><span class='i-tel'>" + info.tel + "</span><br/>";
+
+   ret += "<span class='small'>Fax:</span><span class='i-fax'>" + info.fax + "</span><br/>";
+
+if(info.website != '')
+   ret += "<span class='small'>Website:</span><span class='i-web'><a href='" + info.website + "' />"+info.website+"</span>";
+else
+   ret += "<span class='small'>Website:</span><span class='i-web'>"+info.website+"</span>";
+
+  ret += "</div>";
+  return ret;
+}
+
+$(document).ready(function() {
+    $("a#help_link").qtip({content: "<b>Help</b><br/>Enter search terms and hit enter!<br/>Hover over textboxes for help.", position: { my: 'right center', at: 'left center' }});
+    $("#query").qtip({content: "<b>Search terms</b><br/>Examples: <em>cafe</em>, <em>books</em>, <em>car wash</em>",
+                      position: { my: 'top center', at: 'bottom center' }});
+
+    $("#near").qtip({content: "<b>Location</b><br/>Examples: <em>market and vanness</em>, <em>san diego</em>, <em>los angeles</em>.  We support only SF, LA, San Diego, NY, Seattle and Chicago now.",
+                      position: { my: 'top center', at: 'bottom center' }});
+
+});
+
+
+  function initialize() {
+
+    $("select#count").change(function() { $(this).closest("form").submit(); $(this).attr("disabled", "disabled");  });
+
+    results = [];
+    markers = [];
+    infowindows = [];
+
+<% @results['results'].each do |category, items|
+     items.each do |r|
+   if r['latitude'].length != 0 then
+%>
+
+/* I guess this is the worst way of doing it. */
+ results.push({
+  geo: new google.maps.LatLng(<%= r['latitude'] %>, <%= r['longitude'] %>),
+  title: "<%= r['name'] %>",
+  info: {
+    docid: "<%= r['docid'] %>",
+    address: "<%= r['address'] %>",
+    city: "<%= r['city'] %>",
+    state: "<%= r['state'] %>",
+    tel: "<%= r['telephone'] %>",
+    fax: "<%= r['fax'] %>",
+    category: "<%= r['category'] %>",
+    website: "<%= r['website'] %>",
+  }
+});
+<%   end end
+end %>
+
+    var latlng = new google.maps.LatLng(<%= @loc.latitude %>, <%= @loc.longitude %>);
+
+    var myOptions = {
+      zoom: 12,
+      center: latlng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+
+    var map = new google.maps.Map(document.getElementById("map"),
+        myOptions);
+
+    if(results.length > 0) {
+      var latlngbounds = new google.maps.LatLngBounds();
+      for (var i = 0; i < results.length; i++)
+      {
+         latlngbounds.extend(results[i].geo);
+      }
+      map.fitBounds(latlngbounds);
+    }
+
+  for(var i = 0; i < results.length; i++) {
+    var marker = new google.maps.Marker({
+      map:map,
+      draggable:false,
+      position: results[i].geo,
+      title: results[i].title,
+    });
+    markers.push(marker);
+    infowindows.push(new google.maps.InfoWindow({
+         content: get_content(i),
+    }));
+
+    google.maps.event.addListener(marker, 'click', function(i) {
+      var idx;
+      return function() {
+         if(openwindow)
+           openwindow.close();
+         infowindows[i].open(map, markers[i]);
+         openwindow = infowindows[i];
+         edit_in_place(i);
+      }
+    }(i));
+   }
+
+}
+</script>
+</head>
+<body onload="initialize()">
+<div id="search" class="drop-shadow lifted raised translucent"></div>
+<div id="controls">
+<%= form_tag '/maps', :id => "search", :method => :get do %>
+<a href="/maps"><img src="/images/Srch.png" style="float: left; padding-top: 5px;"/></a>
+<a class="text" href="#" id="help_link">Help?</a>
+<%= text_field_tag "query", params[:query],
+    :autocomplete => "off",
+    :placeholder => "Srch locally! Cafe / Auto / Computers" %>
+<%= text_field_tag "near", params[:near], :autocomplete => "off",
+    :placeholder => "Near #{@default_loc}" %>
+<%= select_tag "count", options_for_select((1..5).map { |i| ["#{i*10} results", i*10] }, @count), :multiple => false %>
+<%= submit_tag "Srch!", :class => "clean-gray" %>
+<% if @results['results'].length > 0 %>
+
+<span class="tot"><br/>Showing <%= @nresults_total %> out of
+  <%= @results['matches'] %> results.  <%= link_to "Want text results?", "/search?" +
+params[:query].to_query('query') + "&" + params[:near].to_query('near') %></span>
+
+<% elsif @results['matches'] == 0 %>
+<br/><span class="tot none">No results in our database :(</span>
+<% end %>
+<% end %>
+</div>
+<div id="map">
+</div>
+</body>
